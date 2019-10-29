@@ -1,0 +1,174 @@
+<?php 
+include("inc/session.php");
+include("plugins/data.php");
+$name = $_SESSION['username'];
+$groupid = $_SESSION['groupid'];
+?>
+<!doctype html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+    <link href="assets/css/tables.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css" rel="stylesheet">
+    <link href="assets/dist/admin4b.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="assets/dist/admin4b-highlight.min.css" rel="stylesheet">
+    <title>TSRadioBot &middot Botliste</title>
+</head>
+
+<body>
+    <div class="app">
+        <div class="app-body">
+            <div class="app-sidebar sidebar-dark sidebar-slide-left">
+                <div class="text-right">
+                    <button type="button" class="btn btn-sidebar" data-dismiss="sidebar">
+      <span class="x"></span>
+    </button>
+                </div>
+                <div class="sidebar-header">
+                    <?php echo '<img src="assets/upload/'.$_SESSION['IMG'].'" class="user-photo" alt="Kein Profilfoto gefunden">'; ?>
+                    <p class="username">
+                        <?php 
+                            include("inc/verifer.php");
+                            echo $name.$out;
+                            echo '<br /><small>'.$groupid.'</small>';
+                            ?>
+                    </p>
+                </div>
+                <div id="sidebar-nav" class="sidebar-nav" data-children=".sidebar-nav-group">
+                    <a href="dashboard.php" class="sidebar-nav-link">
+      <i class="material-icons">dashboard</i> Dashboard
+    </a>
+                    <div class="sidebar-nav">
+                        <a href="orders.php" class="sidebar-nav-link">
+        <i class="material-icons">shopping_cart</i> Bestellungen
+      </a>
+                    </div>
+                    <div class="sidebar-nav">
+                        <a href="#" class="sidebar-nav-link">
+        <i class="material-icons">format_list_bulleted</i> Musikbots
+      </a>
+                    </div>
+                    <?php
+                        if($groupid == "#1337"){
+                            echo '<div class="sidebar-nav">';
+                            echo '<a href="botcontrol.php" class="sidebar-nav-link">';
+                            echo '<i class="material-icons">queue</i> Bot Control';
+                            echo '</a>';
+                            echo '</div>';
+                        }
+                            ?>
+
+
+
+                </div>
+                <div class="sidebar-footer">
+                    <a href="email.php?v=fehlermelden&data=frmn" data-toggle="tooltip" title="Fehler melden">
+      <i class="material-icons">bug_report</i>
+    </a>
+                    <a href="http://status.tsradiobot.de" data-toggle="tooltip" title="Host System Status">
+      <i class="material-icons">dns</i>
+    </a>
+                    <a href="profile.php" data-toggle="tooltip" title="Account Einstellungen">
+      <i class="material-icons">settings</i>
+    </a>
+                    <a href="logout.php" data-toggle="tooltip" title="Ausloggen">
+      <i class="material-icons">power_settings_new</i>
+    </a>
+                </div>
+                <hr />
+                <?php
+                    if($groupid == '#1337'){
+                        echo '<div style="margin-top: 410px;"></div>';
+                    }else {
+                        echo '<div style="margin-top: 450px;"></div>';
+                    }
+                    ?>
+                    <hr />
+                    <i class="cp">TSRadiobot &copy; 2018 &nbsp;<br /><a href="https://www.twitter.com/variiuz">Coded with &hearts; by VariusDev</a></i>
+            </div>
+
+            <div class="app-content">
+                <nav class="navbar navbar-expand navbar-light bg-white">
+                    <button type="button" class="btn btn-sidebar" data-toggle="sidebar">
+    <i class="fa fa-bars"></i>
+  </button>
+                    <div class="navbar-brand">
+                        TSRadioBot &middot Botliste
+                    </div>
+                </nav>
+
+
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Botlist</li>
+                    </ol>
+                </nav>
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="tablebox">
+                            <h2 class="box-title" align="center"><i class="material-icons">video_library</i> Bots</h2>
+                            <hr />
+                            <input type="text" id="inputsearch" onkeyup="search()" placeholder="BotID suchen..." align="left">
+                            <table class="tables" id="tables">
+                                <thead>
+                                    <tr>
+                                        <th style="width:15%;">BotID</th>
+                                        <th style="width:15%;">Botname</th>
+                                        <th style="width:15%;">Node</th>
+                                        <th style="width:15%;">IP-Adresse/Domain</th>
+                                        <th style="width:15%;">Status</th>
+                                        <th style="width:10%;">Bearbeiten</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    <?php
+                                    $result = mysqli_query($db,"SELECT * FROM Botlist WHERE groupid='".$groupid."'");         
+                                    while($row = mysqli_fetch_array($result)){                                        
+                                        echo "<tr>";                                      
+                                        echo "<td>" . $row['BotID'] . "</td>";                                              
+                                        echo "<td>" . $row['BotName'] . "</td>";   
+                                        $system = $row['System'];
+                                        if($system=='DE-3'){
+                                            $status= '<img src="http://icons.iconarchive.com/icons/custom-icon-design/flat-europe-flag/16/Germany-icon.png" alt="IMG" /> <a href="status.php?node=de-3">DE-3</a>';
+                                                           }
+                                        if($system=='DE-2'){
+                                            $status= '<img src="http://icons.iconarchive.com/icons/custom-icon-design/flat-europe-flag/16/Germany-icon.png" alt="IMG" /> <a href="status.php?node=de-2">DE-2</a>';
+                                        }
+                                        if($system=='DE-1'){
+                                            $status= '<img src="http://icons.iconarchive.com/icons/custom-icon-design/flat-europe-flag/16/Germany-icon.png" alt="IMG" /> <a href="status.php?node=de-1">DE-1</a>';
+                                        }
+                                                                                $outer = 'Status: <span class="badge badge-warning">Unbekannt</span>';
+$outer = 'Status: <span class="badge badge-warning">Unbekannt</span>'; $ipadress = strtolower($system).".tsradiobot.de"; $fp = fsockopen($ipadress, $row['Port'], $errno, $errstr, 30); if (!$fp) { $outer = 'Status: <span class="badge badge-danger">Offline</span>'; } else { $outer = 'Status: <span class="badge badge-success">Online</span>'; }
+                                        echo "<td>" .$status."</td>"; 
+                                        echo "<td>" . urldecode($row['IP']) . "</td>";
+                                        $botid = $row['BotID'];
+                                        echo "<td>".$outer."</td>";
+                                        echo '<td><form action="bot.php" method="post"><input type="hidden" name="bot" value='.$row['BotID'].'><input type="hidden" name="port" value='.$row['Port'].'> <button type="submit" class="btn btn-info"> Optionen</button> </form></td>';
+                                        echo "</tr>"; } mysqli_close($con); ?>
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.0/moment.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script src="assets/dist/admin4b.min.js"></script>
+        <script src="assets/js/admin4b.docs.js"></script>
+</body>
+
+</html>
